@@ -4,7 +4,13 @@ from PopulationAnalysis..populationDistribution
 select *
 from PopulationAnalysis..uscities
 
+
+----------------------------------------------------------------------------------------------------------------------
+
+
 -- creating pivot table for table populationDistribution
+
+
 Select *
 FROM PopulationAnalysis..PopulationDistribution as SourceTable  
 PIVOT (
@@ -16,7 +22,9 @@ PIVOT (
 ) AS Pivot_SalesRegionMonth
 Order by State, City
 
+
 -- use City to join pivot table and uscities together
+
 
 Drop Table if exists Combined
 Create Table Combined
@@ -54,6 +62,7 @@ join (Select *
 	  )
 	) AS Pivot_SalesRegionMonth) p
 on u.City=p.City
+
 
 Create View USAStatePopulation as
 Select state_id, state, max(timezone) as timezone, Round(Avg(medianAge),2) as medianAge, 
