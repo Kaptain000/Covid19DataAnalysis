@@ -2,8 +2,12 @@ Select *
 From WalmartStoreLocation..PopulationDistribution
 Order by State, City
 
+---------------------------------------------------------------------------------------------------------------
+
 
 --- creating pivot table without PIVOT fuction
+
+
 Drop Table if exists #RaceDistribution
 Create Table #RaceDistribution
 (
@@ -23,6 +27,7 @@ BlackOrAfricanAmerican numeric,
 HispanicOrLatino numeric,
 White numeric,
 )
+
 
 Insert into #RaceDistribution
 Select 	Max("State Code"),
@@ -50,6 +55,8 @@ Order by State, City
 
 
 --- creating pivot table with PIVOT fuction
+
+
 Select *
 FROM WalmartStoreLocation..PopulationDistribution as SourceTable  
 PIVOT (
@@ -61,7 +68,12 @@ PIVOT (
 ) AS Pivot_SalesRegionMonth
 Order by State, City
 
+
+------------------------------------------------------------------------------------------------------------
+
+
 -- Ceating view for Tableau
+
 
 Create view RaceDistribution as
 Select *
@@ -79,11 +91,14 @@ Select *
 From RaceDistribution
 Order by State, City
 
+
 -----------------------------------Walmart Analysis----------------------------------------
+
 
 Select *
 From WalmartStoreLocation..WalmartDistribution
 Where [Avg# Walmart Wage] is null
+
 
 Update WalmartDistribution
 Set [Avg# Walmart Wage] = (
@@ -92,41 +107,53 @@ Set [Avg# Walmart Wage] = (
 	Where [Avg# Walmart Wage] is not null)
 Where [Avg# Walmart Wage] is null
 
+
 Update WalmartDistribution
 Set State = Case when State='DC' then 'Washington' else State end
+
 
 Update WalmartDistribution
 Set State = Case when State like '%Virginia' then 'Virginia' else State end
 
+
 Select cast(Population/[Quantity of Walmarts] as int) as PopulationPerWalmart 
 From WalmartStoreLocation..WalmartDistribution
 
+
 ALTER TABLE WalmartDistribution
 Add WalmartPer10000People Float
+
 
 Update WalmartDistribution
 Set WalmartPer10000People = Round([Quantity of Walmarts]*10000/Population, 3)
 From WalmartStoreLocation..WalmartDistribution
 
+
 Select *
 From WalmartStoreLocation..WalmartDistribution
 
+
 ALTER TABLE WalmartDistribution
 Add SmallBusinessPerWalmart Numeric
+
 
 Update WalmartDistribution
 Set SmallBusinessPerWalmart = [# of SMALL BUSINESSES]/[Quantity of Walmarts]
 From WalmartStoreLocation..WalmartDistribution
 
+
 Select *
 From WalmartStoreLocation..WalmartDistribution
+
 
 ALTER TABLE WalmartDistribution
 Add PopulationPerSmallBusiness Numeric
 
+
 Update WalmartDistribution
 Set PopulationPerSmallBusiness = Population/[# of SMALL BUSINESSES]
 From WalmartStoreLocation..WalmartDistribution
+
 
 Select *
 From WalmartStoreLocation..WalmartDistribution
@@ -136,13 +163,15 @@ where * is null
 ALTER TABLE WalmartDistribution
 Add EmployeesPerWalmart Numeric
 
+
 Update WalmartDistribution
 Set EmployeesPerWalmart = [# of Walmart Employees]/[Quantity of Walmarts]
 From WalmartStoreLocation..WalmartDistribution
 
 
-
 --------------------------------combine table and create view for tableau---------------------------------------
+
+
 Create view WalmartVsLocationAndPopulation as
 Select w.*, r.AverageHouseholdSize, r.AmericanIndianAndAlaskaNative, r.Asian, r.BlackOrAfricanAmerican, r.HispanicOrLatino, r.White
 From WalmartStoreLocation..WalmartDistribution w
