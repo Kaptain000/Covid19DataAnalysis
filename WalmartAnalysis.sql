@@ -142,9 +142,9 @@ From WalmartStoreLocation..WalmartDistribution
 
 
 
--------------------------------------------combine table---------------------------------------
-
-Select *
+--------------------------------combine table and create view for tableau---------------------------------------
+Create view WalmartVsLocationAndPopulation as
+Select w.*, r.AverageHouseholdSize, r.AmericanIndianAndAlaskaNative, r.Asian, r.BlackOrAfricanAmerican, r.HispanicOrLatino, r.White
 From WalmartStoreLocation..WalmartDistribution w
 left join (Select State,
 				Avg([Average Household Size]) as AverageHouseholdSize, 
@@ -156,4 +156,8 @@ left join (Select State,
 			From RaceDistribution
 			Group by State) r
 on w.State = r.State
+
+
+
+
 
