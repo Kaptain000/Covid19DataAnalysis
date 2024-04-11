@@ -52,7 +52,7 @@ Select location, SUM(cast(new_deaths as int)) as TotalDeathCount
 From PortfolioProject..CovidDeaths
 --Where location like '%states%'
 Where continent is null 
-	and location not in ('World', 'European Union', 'International')
+	and location not in ('World', 'European Union', 'International', 'High income', 'Upper middle income', 'Lower middle income', 'Low income')
 Group by location
 order by TotalDeathCount desc
 
@@ -62,22 +62,46 @@ Select location, SUM(cast(new_deaths as int)) as TotalDeathCount
 From PortfolioProject..CovidDeaths
 --Where location like '%states%'
 Where continent is null 
-	and location not in ('World', 'European Union', 'International')
+	and location not in ('World', 'European Union', 'International', 'High income', 'Upper middle income', 'Lower middle income', 'Low income')
 Group by location
 
 
--- Death rate by time
+-- Total death by income
 
 
-Select Location, date, population, total_cases, total_deaths, (total_deaths/total_cases)*100 as DeathPercentage
+Select location, SUM(cast(new_deaths as int)) as TotalDeathCount
+From PortfolioProject..CovidDeaths
+--Where location like '%states%'
+Where continent is null 
+	and location in ('High income', 'Upper middle income', 'Lower middle income', 'Low income')
+Group by location
+
+
+Create View TotallDeathsByIncome as
+Select location, SUM(cast(new_deaths as int)) as TotalDeathCount
+From PortfolioProject..CovidDeaths
+--Where location like '%states%'
+Where continent is null 
+	and location in ('High income', 'Upper middle income', 'Lower middle income', 'Low income')
+Group by location
+
+
+-- Cumulative death and rate by time
+
+
+Select Location, date, population, total_cases, new_deaths, total_deaths,
+	Sum(new_deaths) over(Partition by Location order by Location, date) as CumulativeTotalDeath, 
+	((Sum(new_deaths) over(Partition by Location order by Location, date))/total_cases)*100 as DeathPercentage
 From PortfolioProject..CovidDeaths
 --Where location like '%states%'
 where continent is not null 
 order by 1,2
 
 
-Create View CountryDeathRateByTime as
-Select Location, date, population, total_cases, total_deaths, (total_deaths/total_cases)*100 as DeathPercentage
+Create View CumulativeDeathByTime as
+Select Location, date, population, total_cases, new_deaths
+	Sum(new_deaths) over(Partition by Location order by Location, date) as CumulativeTotalDeath, 
+	((Sum(new_deaths) over(Partition by Location order by Location, date))/total_cases)*100 as DeathPercentage
 From PortfolioProject..CovidDeaths
 --Where location like '%states%'
 where continent is not null 
@@ -184,7 +208,7 @@ order by 1,2,3
 
 
 Select dea.continent, dea.location, dea.date, dea.population
-, MAX(vac.total_vaccinations) as RollingPeopleVaccinated
+, MAX(vac.total_vaccinations) as RollingPeopleVaccinated, (MAX(vac.total_vaccinations) / dea.population) as VaccinationPercentage
 --, (RollingPeopleVaccinated/population)*100
 From PortfolioProject..CovidDeaths dea
 Join PortfolioProject..CovidVaccinations vac
@@ -197,7 +221,7 @@ order by 1,2,3
 
 Create View TotalVaccinations as
 Select dea.continent, dea.location, dea.date, dea.population
-, MAX(vac.total_vaccinations) as RollingPeopleVaccinated
+, MAX(vac.total_vaccinations) as RollingPeopleVaccinated, (MAX(vac.total_vaccinations) / dea.population) as VaccinationPercentage
 --, (RollingPeopleVaccinated/population)*100
 From PortfolioProject..CovidDeaths dea
 Join PortfolioProject..CovidVaccinations vac
@@ -247,6 +271,7 @@ Join PortfolioProject..CovidVaccinations vac
 	On dea.location = vac.location
 	and dea.date = vac.date
 where dea.continent is not null 
+
 
 Select *, (RollingPeopleVaccinated/Population)*100 as Vaccination_Percentage
 From #PercentPopulationVaccinated
