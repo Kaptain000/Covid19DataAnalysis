@@ -92,7 +92,7 @@ From RaceDistribution
 Order by State, City
 
 
------------------------------------Walmart Analysis----------------------------------------
+-----------------------------------Standerize Data Format----------------------------------------
 
 
 Select *
@@ -115,6 +115,7 @@ Set State = Case when State='DC' then 'Washington' else State end
 Update WalmartDistribution
 Set State = Case when State like '%Virginia' then 'Virginia' else State end
 
+-----------------------------------Walmart Analysis----------------------------------------
 
 Select cast(Population/[Quantity of Walmarts] as int) as PopulationPerWalmart 
 From WalmartStoreLocation..WalmartDistribution
@@ -155,11 +156,6 @@ Set PopulationPerSmallBusiness = Population/[# of SMALL BUSINESSES]
 From WalmartStoreLocation..WalmartDistribution
 
 
-Select *
-From WalmartStoreLocation..WalmartDistribution
-where * is null
-
-
 ALTER TABLE WalmartDistribution
 Add EmployeesPerWalmart Numeric
 
@@ -173,7 +169,7 @@ From WalmartStoreLocation..WalmartDistribution
 
 
 Create view WalmartVsLocationAndPopulation as
-Select w.*, r.AverageHouseholdSize, r.AmericanIndianAndAlaskaNative, r.Asian, r.BlackOrAfricanAmerican, r.HispanicOrLatino, r.White
+Select w.*,  r.AverageHouseholdSize, r.AmericanIndianAndAlaskaNative, r.Asian, r.BlackOrAfricanAmerican, r.HispanicOrLatino, r.White
 From WalmartStoreLocation..WalmartDistribution w
 left join (Select State,
 				Avg([Average Household Size]) as AverageHouseholdSize, 
