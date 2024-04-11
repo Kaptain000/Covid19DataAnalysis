@@ -1,5 +1,9 @@
+
+
+
 select *
 from PopulationAnalysis..populationDistribution
+
 
 select *
 from PopulationAnalysis..uscities
@@ -23,7 +27,7 @@ PIVOT (
 Order by State, City
 
 
--- use City to join pivot table and uscities together
+-- Combine pivot table and uscities table
 
 
 Drop Table if exists Combined
@@ -73,3 +77,11 @@ Select state_id, state, max(timezone) as timezone, Round(Avg(medianAge),2) as me
 	Round(Avg(averageHouseHoldSize),2) as averageHouseHoldSize
 From Combined
 Group by state_id, state
+
+Select *
+From Combined
+
+
+select state, sum(Native_American), sum(Asian), sum(African_American), sum(Hispanic_Lantio), Sum(White)
+from Combined
+group by state
